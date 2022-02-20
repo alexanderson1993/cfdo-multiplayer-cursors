@@ -1,6 +1,16 @@
 name = "websocket-template"
-type = "webpack"
-account_id = "b54f07a6c269ecca2fa60f1ae4920c99"
+type = "javascript"
+account_id = "532264959bf6572ae8a82ebfd3b65910"
 workers_dev = true
-route = ""
-zone_id = ""
+zone_id = "4976283a25385e26f1370960928d6b92"
+routes = ["thoriumsim.com/*"]
+
+[build.upload]
+format = "modules"
+dir = "./src"
+main = "./index.mjs"
+
+[durable_objects]
+bindings = [
+  { name = "router", class_name = "Router" }
+]
