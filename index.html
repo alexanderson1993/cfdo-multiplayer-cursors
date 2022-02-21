@@ -126,6 +126,7 @@
   let ws
 
   async function websocket(url) {
+    // console.log({ url })
     ws = new WebSocket(url)
 
     if (!ws) {
@@ -138,8 +139,12 @@
     })
 
     ws.addEventListener('message', ({ data }) => {
+      // console.log(data)
       const { type, ...other } = JSON.parse(data)
       switch (type) {
+        case 'cursorAdded':
+          createCursor(other.cursor)
+          break
         case 'gotState':
           // Create cursors, place them
           console.log(other.state)
@@ -148,6 +153,7 @@
               createCursor(cursor)
             })
           }
+          break
         case 'cursorsMoved':
           // Move each of the cursors
           if (Array.isArray(other.movedCursors)) {
@@ -155,8 +161,10 @@
               moveCursor(cursor)
             })
           }
+          break
         case 'cursorRemoved':
           removeCursor(other.id)
+          break
       }
     })
   }
@@ -169,12 +177,17 @@
   document.addEventListener('mousemove', event => {
     const position = { x: event.clientX, y: event.clientY }
     const element = document.getElementById('cursor')
-    element.style.transform = `translate3d(${position.x}px, ${position.y}px, 0)`
+    element.style.transform = `translate3d(\${position.x}px, \${position.y}px, 0)`
+    const positions = {
+      x: position.x / window.innerWidth,
+      y: position.y / window.innerWidth,
+    }
+    console.log({ positions })
+
     ws.send(
       JSON.stringify({
         type: 'cursorMoved',
-        x: position.x / window.innerWidth,
-        y: position.y / window.innerWidth,
+        ...positions,
       }),
     )
   })
@@ -209,7 +222,7 @@
       innerHTML: cursorTemplate,
       id,
       style: {
-        transform: `translate(${x * window.innerWidth}px, ${y *
+        transform: `translate(\${x * window.innerWidth}px, \${y *
           window.innerHeight}px)`,
       },
     })
@@ -217,11 +230,18 @@
   }
 
   function removeCursor(id) {
-    document.getElementById(id).remove()
+    document.getElementById(id)?.remove()
   }
 
-  function moveCursor(id, x, y) {
-    document.getElementById(id).style.transform = `translate(${x *
-      window.innerWidth}px, ${y * window.innerHeight}px)`
+  function moveCursor({ id, x, y }) {
+    const el = document.getElementById(id)
+    // console.log({el});
+
+    if (!el) {
+      console.error('did not find id: ' + id)
+      return
+    }
+    el.style.transform = `translate(\${x *
+      window.innerWidth}px, \${y * window.innerHeight}px)`
   }
 </script>
