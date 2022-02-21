@@ -174,10 +174,20 @@ const template = `
   url.pathname = '/ws'
   websocket(url)
 
+  window.onbeforeunload = function() {
+    ws.onclose = function () {}; // disable onclose handler first
+    ws.close();
+  };
+
   document.addEventListener('mousemove', event => {
     const position = { x: event.clientX, y: event.clientY }
     const element = document.getElementById('cursor')
     element.style.transform = \`translate3d(\${position.x}px, \${position.y}px, 0)\`
+    const positions = {
+      x: position.x / window.innerWidth,
+      y: position.y / window.innerWidth,
+    }
+    // console.log({ positions })
     ws.send(
       JSON.stringify({
         type: 'cursorMoved',
@@ -213,15 +223,19 @@ const template = `
   </div>\`
 
   function createCursor({ id, x, y }) {
-    const cursor = Object.assign(document.createElement('div'), {
+    const cursorDiv = document.createElement('div')
+    Object.assign(cursorDiv, {
       innerHTML: cursorTemplate,
       id,
-      style: {
-        transform: \`translate(\${x * window.innerWidth}px, \${y *
-          window.innerHeight}px)\`,
-      },
+      classList: 'cursor'
     })
-    document.getElementById('cursors').append(cursor)
+    Object.assign(cursorDiv.style, {
+      
+        transform: \`translate(\${x * window.innerWidth}px, \${y *
+          window.innerHeight}px)\`,      
+    })
+
+    document.getElementById('cursors').append(cursorDiv)
   }
 
   function removeCursor(id) {
@@ -230,7 +244,10 @@ const template = `
 
   function moveCursor({id, x, y}) {
     const el =  document.getElementById(id);
-    if (!el) return;
+    if (!el) {
+      console.error('did not find id: ' + id);
+      return;
+    }
     el.style.transform = \`translate(\${x *
       window.innerWidth}px, \${y * window.innerHeight}px)\`
   }
