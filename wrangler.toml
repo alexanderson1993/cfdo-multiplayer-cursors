@@ -1,9 +1,8 @@
 name = "websocket-template"
 type = "javascript"
-account_id = "532264959bf6572ae8a82ebfd3b65910"
+account_id = "705cc338575f6bc5c2059ad0b922312f"
 workers_dev = true
-zone_id = "4976283a25385e26f1370960928d6b92"
-routes = ["thoriumsim.com/*"]
+compatibility_date = "2022-02-20"
 
 [build.upload]
 format = "modules"
