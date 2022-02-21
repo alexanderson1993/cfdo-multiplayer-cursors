@@ -226,7 +226,8 @@ const template = `
     const cursorDiv = document.createElement('div')
     Object.assign(cursorDiv, {
       innerHTML: cursorTemplate,
-      id
+      id,
+      classList: 'cursor'
     })
     Object.assign(cursorDiv.style, {
       
